@@ -105,29 +105,29 @@ Game::~Game(void) {
 }
 
 int Game::run(void) {
-	const int __logicSteps = 100;
-	const sf::Time __logicStep = sf::seconds(1) / (float)__logicSteps;
+	const int logicSteps = 100;
+	const sf::Time logicStep = sf::seconds(1) / (float)logicSteps;
 	_window.create(sf::VideoMode(320, 320), _caption, sf::Style::Titlebar | sf::Style::Close);
 	_window.setVerticalSyncEnabled(true);
 	_window.setView(sf::View(sf::FloatRect(0, 0, 160, 160)));
 	
-	sf::Event __e;
-	sf::Clock __updateClock;
-	sf::Clock __statClock;
-	sf::Time __passedUpdateTime;
-	sf::Time __passedStatTime;
-	int __numFrames = 0;
-	int __numUpdates = 0;
+	sf::Event e;
+	sf::Clock updateClock;
+	sf::Clock statClock;
+	sf::Time passedUpdateTime;
+	sf::Time passedStatTime;
+	int numFrames = 0;
+	int numUpdates = 0;
 #ifndef NDEBUG
-	char __caption[256];
+	char caption[256];
 #endif
-	bool __keydown = false;
+	bool keydown = false;
 
-	sf::Texture &__maptex = gettexture("data/map.png");
+	sf::Texture &maptex = gettexture("data/map.png");
 
 	for (int i = 0; i < KEY_COUNT; _keytapped[i] = _keydown[i] = false, i++);
 	for (int i = 0; i < 16; i++) {
-		_mapsprites[i].setTexture(__maptex);
+		_mapsprites[i].setTexture(maptex);
 		_mapsprites[i].setTextureRect(sf::IntRect((i % 4) * 16, (i / 4) * 16, 16, 16));
 	}
 	
@@ -138,40 +138,40 @@ int Game::run(void) {
 	_reset();
 
 	while(_window.isOpen()) {
-		while (_window.pollEvent(__e) && _running) {
-			__keydown = false;
-			switch (__e.type) {
+		while (_window.pollEvent(e) && _running) {
+			keydown = false;
+			switch (e.type) {
 			case sf::Event::Closed:
 				_window.close();
 				_running = false;
 				break;
 			case sf::Event::KeyPressed:
-				__keydown = true;
+				keydown = true;
 			case sf::Event::KeyReleased:
-				switch (__e.key.code) {
+				switch (e.key.code) {
 				case sf::Keyboard::Escape:
 					_window.close();
 					_running = false;
 					break;
 				case sf::Keyboard::Left:
 				case sf::Keyboard::A:
-					_keyevent(KEY_LEFT, __keydown);
+					_keyevent(KEY_LEFT, keydown);
 					break;
 				case sf::Keyboard::Right:
 				case sf::Keyboard::D:
-					_keyevent(KEY_RIGHT, __keydown);
+					_keyevent(KEY_RIGHT, keydown);
 					break;
 				case sf::Keyboard::Up:
 				case sf::Keyboard::W:
-					_keyevent(KEY_UP, __keydown);
+					_keyevent(KEY_UP, keydown);
 					break;
 				case sf::Keyboard::Down:
 				case sf::Keyboard::S:
-					_keyevent(KEY_DOWN, __keydown);
+					_keyevent(KEY_DOWN, keydown);
 					break;
 				case sf::Keyboard::Space:
 				case sf::Keyboard::Return:
-					_keyevent(KEY_ATTACK, __keydown);
+					_keyevent(KEY_ATTACK, keydown);
 					break;
 				}
 				break;
@@ -181,20 +181,20 @@ int Game::run(void) {
 		if (_doreset)
 			_reset();
 
-		__passedUpdateTime += __updateClock.restart();
-		for (; _running && __passedUpdateTime > __logicStep; __passedUpdateTime -= __logicStep) {
-			if (__numUpdates < __logicSteps) {
+		passedUpdateTime += updateClock.restart();
+		for (; _running && passedUpdateTime > logicStep; passedUpdateTime -= logicStep) {
+			if (numUpdates < logicSteps) {
 				_update();
 				_entities.erase(std::remove_if(_entities.begin(), _entities.end(), &::delcheck), _entities.end());
 				for (int i = 0; i < KEY_COUNT; _keytapped[i] = false, i++);
-				++__numUpdates;
+				++numUpdates;
 			}
 			else {
-				__passedUpdateTime = sf::Time::Zero;
+				passedUpdateTime = sf::Time::Zero;
 				break;
 			}
 		}
-		++__numFrames;
+		++numFrames;
 
 		std::sort(_entities.begin(), _entities.end(), &::cmpentity);
 
@@ -204,16 +204,16 @@ int Game::run(void) {
 		}
 		_draw();
 
-		__passedStatTime += __statClock.restart();
-		if ((int)__passedStatTime.asSeconds() > 0) {
-			__passedStatTime = sf::Time::Zero;
-			_fps = __numFrames;
-			_ups = __numUpdates;
-			__numFrames = 0;
-			__numUpdates = 0;
+		passedStatTime += statClock.restart();
+		if ((int)passedStatTime.asSeconds() > 0) {
+			passedStatTime = sf::Time::Zero;
+			_fps = numFrames;
+			_ups = numUpdates;
+			numFrames = 0;
+			numUpdates = 0;
 #ifndef NDEBUG
-			snprintf(__caption, 255, "%s [fps: %d, ups: %d]", _caption, _fps, _ups);
-			_window.setTitle(__caption);
+			snprintf(caption, 255, "%s [fps: %d, ups: %d]", _caption, _fps, _ups);
+			_window.setTitle(caption);
 #endif
 		}
 		sf::sleep(sf::microseconds(1));
@@ -234,8 +234,8 @@ void Game::_update(void) {
 }
 
 void Game::_draw(void) {
-	static const sf::Color __back(87, 127, 63);
-	_window.clear(__back);
+	static const sf::Color back(87, 127, 63);
+	_window.clear(back);
 	for (int y = 0; y < 10; y++) {
 		for (int x = 0, i = 0; x < 10; x++, i++) {
 			//if (!::map[y][x])
@@ -287,36 +287,40 @@ bool Game::solid(char x, char y) {
 	return ::smap[y][x];
 }
 
+bool Game::water(char x, char y) {
+	return y != 5 && (x == 4 || x == 5);
+}
+
 sf::Texture &Game::gettexture(const char *file) {
 	std::map<const std::string, sf::Texture*>::iterator a = _textures.find(file);
 	if (a != _textures.end())
 		return *a->second;
-	sf::Texture *__n = new sf::Texture();
-	if (!__n->loadFromFile(file))
+	sf::Texture *n = new sf::Texture();
+	if (!n->loadFromFile(file))
 		throw "Failed to load texture.";
-	_textures[file] = __n;
-	return *__n;
+	_textures[file] = n;
+	return *n;
 }
 
 sf::SoundBuffer &Game::getbuffer(const char *file) {
 	std::map<const std::string, sf::SoundBuffer*>::iterator a = _buffers.find(file);
 	if (a != _buffers.end())
 		return *a->second;
-	sf::SoundBuffer *__n = new sf::SoundBuffer();
-	if (!__n->loadFromFile(file))
+	sf::SoundBuffer *n = new sf::SoundBuffer();
+	if (!n->loadFromFile(file))
 		throw "Failed to load sound.";
-	_buffers[file] = __n;
-	return *__n;
+	_buffers[file] = n;
+	return *n;
 }
 
 sf::Sound &Game::getsound(const char *file) {
 	std::map<const std::string, sf::Sound*>::iterator a = _sounds.find(file);
 	if (a != _sounds.end())
 		return *a->second;
-	sf::Sound *__n = new sf::Sound();
-	__n->setBuffer(getbuffer(file));
-	_sounds[file] = __n;
-	return *__n;
+	sf::Sound *n = new sf::Sound();
+	n->setBuffer(getbuffer(file));
+	_sounds[file] = n;
+	return *n;
 }
 
 void Game::addkill(void) {
@@ -327,13 +331,14 @@ void Game::addkill(void) {
 
 void Game::addpass(void) {
 	_passcount++;
-	if (_rage < 11) { // collect up to 10 rage
-		_rage = _rage + 1;
-		((Player*)_player)->setangry();
-	}
-	else if (_rage == 11) { // 11 rage -> game over
-		_player->querydeletion(); // i.e. kill the player
+	if (_rage < 10) { // collect up to 10 rage
 		_rage++;
+		((Player*)_player)->setangry();
+		getsound("data/getaway.wav").play();
+	}
+	else if (_rage == 10) { // 11 rage -> game over
+		_player->querydeletion(); // i.e. kill the player
+		getsound("data/gameover.wav").play();
 	}
 	_updatescore();
 }
@@ -400,14 +405,14 @@ void Game::addpeasant(void) {
 
 	int i = rand() % 10;
 
-	Peasant *__p = new Peasant(this, starts[i][0], starts[i][1]);
-	__p->settarget((TARGET)starts[i][2]);
-	_entities.push_back(__p);
+	Peasant *p = new Peasant(this, starts[i][0], starts[i][1]);
+	p->settarget((TARGET)starts[i][2]);
+	_entities.push_back(p);
 }
 
 void Game::addpoof(int x, int y) {
-	Poof *__p = new Poof(this, x, y);
-	_entities.push_back(__p);
+	Poof *p = new Poof(this, x, y);
+	_entities.push_back(p);
 }
 
 void Game::_updatescore(void) {

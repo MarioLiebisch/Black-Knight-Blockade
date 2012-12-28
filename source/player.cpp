@@ -20,21 +20,21 @@
 
 #include "player.h"
 
-Player::Player(Game *parent, int x, int y) : Entity(parent), _dx(0), _dy(0), _movtick(false), _moving(false), _reverse(false), _step(0), _astep(-1), _alive(true), _exstep(0) {
+Player::Player(Game *parent, int x, int y) : Entity(parent), _dx(0), _dy(0), _moving(false), _reverse(false), _step(0), _astep(-1), _alive(true), _exstep(0) {
 	_x = x;
 	_y = y;
-	sf::Texture &__tex = _parent->gettexture("data/player.png");
+	sf::Texture &tex = _parent->gettexture("data/player.png");
 	for (int i = 0; i < 4; i++) {
-		_sprites[i].setTexture(__tex);
+		_sprites[i].setTexture(tex);
 		_sprites[i].setTextureRect(sf::IntRect(i * 16, 0, 16, 16));
-		_sprites[i].setOrigin(8, 12);
+		_sprites[i].setOrigin(8, 14);
 	}
-	_sword.setTexture(__tex);
+	_sword.setTexture(tex);
 	_sword.setTextureRect(sf::IntRect(0, 16, 16, 16));
-	_sword.setOrigin(2, 12);
-	_exmark.setTexture(__tex);
+	_sword.setOrigin(2, 14);
+	_exmark.setTexture(tex);
 	_exmark.setTextureRect(sf::IntRect(16, 16, 16, 16));
-	_exmark.setOrigin(8, 14);
+	_exmark.setOrigin(8, 16);
 }
 
 Player::~Player(void) {
@@ -43,21 +43,21 @@ Player::~Player(void) {
 
 void Player::update() {
 	if (!_alive) {
-		if (_step < 60) {
+		if (_step < 120) {
 			switch (_step++) {
-			case 10:
+			case 20:
 				_parent->addpoof(_x - 4, _y - 4);
 				break;
-			case 20:
+			case 40:
 				_parent->addpoof(_x + 4, _y + 4);
 				break;
-			case 30:
+			case 60:
 				_parent->addpoof(_x + 4, _y - 4);
 				break;
-			case 40:
+			case 80:
 				_parent->addpoof(_x - 4, _y + 4);
 				break;
-			case 50:
+			case 100:
 				_parent->addpoof(_x, _y);
 				break;
 			}
@@ -69,7 +69,8 @@ void Player::update() {
 		return;
 	}
 	_step = (_step + 1) % 100;
-	if (_movtick = !_movtick) {
+	
+	if ((!_parent->water(_x / 16, (_y + 2) / 16) && _step % 2 == 0) || (_step % 3 == 0)) {
 		_moving = false;
 		if (_parent->keydown(KEY_LEFT)) {
 			_moving = true;
@@ -97,12 +98,12 @@ void Player::update() {
 			while (_y > 156 || _parent->solid(_x / 16, _y / 16))
 				_y--;
 		}
-		if (_astep > -1 && _astep < 8)
-			_astep++;
-		else
-			_astep = -1;
 	}
-	if (_astep == - 1 && _parent->keytapped(KEY_ATTACK)) {
+	if (_astep > -1 && _astep < 20)
+		_astep++;
+	else
+		_astep = -1;
+	if (_astep == - 1 && _parent->keydown(KEY_ATTACK)) {
 		_astep = 0;
 		_parent->getsound("data/stroke.wav").play();
 	}
@@ -111,32 +112,33 @@ void Player::update() {
 void Player::draw() {
 	sf::RenderTarget &rt = _parent->gettarget();
 	if (!_alive) {
-		if (_step < 60) {
-			_sprites[0].setColor(_step % 2 ? sf::Color::White : sf::Color::Red);
+		if (_step < 120) {
+			_sprites[0].setColor(_step % 4 ? sf::Color::White : sf::Color::Red);
 			_sprites[0].setScale(_reverse ? -1 : 1, 1);
 			_sprites[0].setPosition(_x, _y);
 			rt.draw(_sprites[0]);
 		}
 		return;
 	}
-	int __i = 0;
+	int i = 0;
 	if (_moving)
-		__i = (_step / 8) % 4;
+		i = (_step / 8) % 4;
 	if (_reverse) {
-		_sprites[__i].setScale(-1, 1);
+		_sprites[i].setScale(-1, 1);
 		_sword.setScale(-1, 1);
 		_exmark.setScale(-1, 1);
 	}
 	else {
-		_sprites[__i].setScale(1, 1);
+		_sprites[i].setScale(1, 1);
 		_sword.setScale(1, 1);
 		_exmark.setScale(1, 1);
 	}
-	_sprites[__i].setPosition(_x, _y);
-	_sword.setPosition(_reverse ? _x - _astep : _x + _astep, _y);
-	if (_astep != -1)
+	_sprites[i].setPosition(_x, _y);
+	if (_astep > -1 && _astep < 18) {
+		_sword.setPosition(_reverse ? _x - _astep / 2: _x + _astep / 2, _y);
 		rt.draw(_sword);
-	rt.draw(_sprites[__i]);
+	}
+	rt.draw(_sprites[i]);
 	if (_exstep) {
 		if ((_exstep / 2) % 2) {
 			_exmark.setPosition(_x, _y);

@@ -4,7 +4,7 @@
 
 ===============================================================================
 
-  A simple game entry for Ludum Dare 25: You Are The Villain
+  A simple game entry for Ludum Dare 25: You are the Villain
 
 -------------------------------------------------------------------------------
 
@@ -45,7 +45,13 @@ The game cam be played with two sets of controls:
 | Sword thrust | Space         | Return        |
 +--------------+---------------+---------------+
 
-3. Building The Game
+3. Gameplay Notes
+-----------------
+- Walking through the water or along the bank will slow everyone down.
+- Faster peasants are less sturdy against being poked.
+- You can hold down the attack key to swing your sword repeatedly.
+
+4. Building the Game
 --------------------
 To create build files (e.g. makefiles or project files) for your system you'll
 need CMake (http://www.cmake.org/).

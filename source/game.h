@@ -67,6 +67,7 @@ public:
 	bool keytapped(GAME_KEY key) { return _keytapped[key]; }
 	bool keydown(GAME_KEY key) { return _keydown[key]; }
 	bool solid(char x, char y);
+	bool water(char x, char y);
 	sf::Texture &gettexture(const char *file);
 	sf::SoundBuffer &getbuffer(const char *file);
 	sf::Sound &getsound(const char *file);

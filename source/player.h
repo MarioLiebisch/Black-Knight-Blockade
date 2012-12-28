@@ -28,7 +28,6 @@ private:
 	sf::Sprite _sprites[4];
 	sf::Sprite _sword;
 	sf::Sprite _exmark;
-	bool _movtick;
 	bool _reverse;
 	bool _moving;
 	char _step;
