@@ -42,6 +42,7 @@ namespace {
 		{0, 0, 0, 0, 1, 3, 0, 0, 0, 0},
 		{7, 0, 0, 0, 1, 3, 0, 0, 0, 6},
 		{6, 7, 0, 0, 1, 3, 0, 0, 6, 7},
+		/*---------------------------*/
 		{5, 4, 5, 0, 0, 0, 0, 4, 5, 4},
 		{4, 5, 0, 0, 0, 0, 0, 0, 4, 5},
 		{5, 0, 0, 0, 0, 0, 0, 0, 0, 4},
@@ -55,7 +56,7 @@ namespace {
 	};
 
 	const bool smap[10][10] = {
-		{1, 1, 1, 1, 0, 0, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 1, 1, 0, 0, 0, 0, 1, 1, 1},
 		{1, 1, 0, 0, 0, 0, 0, 0, 1, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -96,7 +97,7 @@ namespace {
 	}
 }
 
-Game::Game(void) : _window(), _running(true), _fps(0), _ups(0), _caption("LD25: Black Knight Blockade"), _tick(0), _killcount(0), _passcount(0), _rage(0), _doreset(false) {
+Game::Game(void) : _window(), _running(true), _fps(0), _ups(0), _caption("LD25: Black Knight Blockade"), _tick(0), _rageticks(0), _killcount(0), _passcount(0), _rage(0), _doreset(false) {
 	
 }
 
@@ -230,6 +231,8 @@ int Game::run(void) {
 void Game::_update(void) {
 	if (_tick++ % 1500 == 0)
 		addpeasant();
+	if (_rageticks)
+		_rageticks--;
 	for (int i = 0, j = _entities.size(); i < j; _entities[i]->update(), i++);
 }
 
@@ -257,20 +260,22 @@ void Game::_draw(void) {
 			_window.draw(s);
 		}
 	
+	const sf::Color &c = (_rageticks && (_rageticks / 4) % 2) ? sf::Color::Red : sf::Color::White;
+	
 	drawtext(_scoretext, 25, 5);
 	drawtext("R", 5, 5);
-	drawtext("(", 5, 10);
-	drawtext(_rage > 9 ? "X" : "_", 5, 20);
-	drawtext(_rage > 8 ? "X" : "_", 5, 30);
-	drawtext(_rage > 7 ? "X" : "_", 5, 40);
-	drawtext(_rage > 6 ? "X" : "_", 5, 50);
-	drawtext(_rage > 5 ? "X" : "_", 5, 60);
-	drawtext(_rage > 4 ? "X" : "_", 5, 70);
-	drawtext(_rage > 3 ? "X" : "_", 5, 80);
-	drawtext(_rage > 2 ? "X" : "_", 5, 90);
-	drawtext(_rage > 1 ? "X" : "_", 5, 100);
-	drawtext(_rage > 0 ? "X" : "_", 5, 110);
-	drawtext(")", 5, 120);
+	drawtext("(", 5, 10, c);
+	drawtext(_rage > 9 ? "X" : "_", 5, 20, c);
+	drawtext(_rage > 8 ? "X" : "_", 5, 30, c);
+	drawtext(_rage > 7 ? "X" : "_", 5, 40, c);
+	drawtext(_rage > 6 ? "X" : "_", 5, 50, c);
+	drawtext(_rage > 5 ? "X" : "_", 5, 60, c);
+	drawtext(_rage > 4 ? "X" : "_", 5, 70, c);
+	drawtext(_rage > 3 ? "X" : "_", 5, 80, c);
+	drawtext(_rage > 2 ? "X" : "_", 5, 90, c);
+	drawtext(_rage > 1 ? "X" : "_", 5, 100, c);
+	drawtext(_rage > 0 ? "X" : "_", 5, 110, c);
+	drawtext(")", 5, 120, c);
 	
 	_window.display();
 }
@@ -335,6 +340,7 @@ void Game::addpass(void) {
 		_rage++;
 		((Player*)_player)->setangry();
 		getsound("data/getaway.wav").play();
+		_rageticks = 40;
 	}
 	else if (_rage == 10) { // 11 rage -> game over
 		_player->querydeletion(); // i.e. kill the player
@@ -343,7 +349,8 @@ void Game::addpass(void) {
 	_updatescore();
 }
 
-void Game::drawtext(const char *text, int x, int y) {
+void Game::drawtext(const char *text, int x, int y, const sf::Color &c) {
+	_fontsprite.setColor(c);
 	for (;;) {
 		switch (*text) {
 		case '0':

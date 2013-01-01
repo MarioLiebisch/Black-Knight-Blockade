@@ -17,7 +17,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 # 
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 project(ld25bkb)
 
@@ -33,11 +33,16 @@ if(MSVC)
   list(APPEND SOURCES ${HEADERS})
 endif()
 
+if(WIN32)
+  list(APPEND SOURCES "source/resource.rc")
+endif()
+
 if(WIN32 AND NOT MSVC AND (${CMAKE_BUILD_TYPE} MATCHES "Release"))
   add_executable(ld25bkb WIN32 ${SOURCES})
 else()
   add_executable(ld25bkb ${SOURCES})
 endif()
+
 target_link_libraries(ld25bkb ${SFML_AUDIO_LIBRARY} ${SFML_GRAPHICS_LIBRARY} ${SFML_WINDOW_LIBRARY} ${SFML_SYSTEM_LIBRARY})
 
 install(FILES readme.txt license.txt DESTINATION .)

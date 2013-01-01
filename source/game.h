@@ -55,6 +55,7 @@ private:
 	std::map<const std::string, sf::Sound*> _sounds;
 	Entity *_player;
 	unsigned int _tick;
+	char _rageticks;
 	int _killcount;
 	int _passcount;
 	int _rage;
@@ -75,7 +76,7 @@ public:
 	Entity *getplayer(void) { return _player; }
 	void addpeasant(void);
 	void addpoof(int x, int y);
-	void drawtext(const char *text, int x, int y);
+	void drawtext(const char *text, int x, int y, const sf::Color &c = sf::Color::White);
 	void addkill(void);
 	void addpass(void);
 	void reset(void);

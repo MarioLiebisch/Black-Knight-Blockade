@@ -11,7 +11,8 @@
 CONTENTS:
 1. About The Game
 2. Controls
-3. Building The Game (from sources)
+3. Gameplay Notes
+4. Building the Game (from Sources)
 
 -------------------------------------------------------------------------------
 
@@ -51,8 +52,8 @@ The game cam be played with two sets of controls:
 - Faster peasants are less sturdy against being poked.
 - You can hold down the attack key to swing your sword repeatedly.
 
-4. Building the Game
---------------------
+4. Building the Game (from Sources)
+-----------------------------------
 To create build files (e.g. makefiles or project files) for your system you'll
 need CMake (http://www.cmake.org/).
 Furthermore, you'll need a copy of SFML 2 (http://www.sfml-dev.org/) as well as
