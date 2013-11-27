@@ -1,7 +1,7 @@
 /**
  * Black Knight Blockade, a simple game entry for Ludum Dare 25: You are the Villain
  * 
- * Copyright (C) 2012 Mario Liebisch <mario.liebisch@gmail.com>
+ * Copyright (c) 2013 Mario Liebisch <mario.liebisch@gmail.com>
  * 
  * This file is part of Black Knight Blockade.
  * 
@@ -24,7 +24,7 @@
 Peasant::Peasant(Game *parent, int x, int y) : Entity(parent), _reverse(false), _step(0), _target(TARGET_ANY), _speed(1 + rand() % 3), _health(_speed), _hstep(0), _justhit(false) {
 	_x = x;
 	_y = y;
-	sf::Texture &tex = _parent->gettexture("data/peasant.png");
+	sf::Texture &tex = _parent->gettexture("peasant.png");
 	sf::Color c(rand() % 2 ? 0x7f : 0xff, rand() % 2 ? 0x7f : 0xff, rand() % 2 ? 0x7f : 0xff);
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 2; j++) {
@@ -56,8 +56,9 @@ void Peasant::update() {
 	const bool right = (_target == TARGET_EAST);
 	const bool up = _y > 104;
 	const bool down = _y < 70;
+	const bool water = _parent->water(_x / 16, _y / 16);
 
-	if ((!_parent->water(_x / 16, _y / 16) && _step % _speed == 0) || (_step % (2 * _speed) == 0)) {
+	if ((!water && _step % _speed == 0) || (_step % (2 * _speed) == 0)) {
 		if (left) {
 			_x--;
 			_reverse = true;
@@ -72,6 +73,8 @@ void Peasant::update() {
 		else if (down) {
 			_y++;
 		}
+		if (!water && _speed == 1 && _step % 5 == 0)
+			_parent->adddust(_x, _y - 1);
 	}
 
 	if (_target == TARGET_WEST && _x == -8) {
@@ -91,8 +94,9 @@ void Peasant::update() {
 			_x -= 8;
 		else
 			_x += 8;
+		_y -= (py - _y) / 2.f;
 
-		_parent->getsound("data/hurt.wav").play();
+		_parent->getsound("hurt.wav").play();
 
 		if (--_health == 0) {
 			_delete = true;
@@ -131,7 +135,7 @@ void Peasant::draw() {
 	int i = 0, j = 4;
 	j = 4 + (i = (_step / 8) % 4);
 	if (_hstep)
-		_sprites[j].setColor((_step / 2) % 2 ? sf::Color::White : sf::Color::Red);
+		_sprites[j].setColor((_speed * _step / 2) % 2 ? sf::Color::White : sf::Color::Red);
 	else
 		_sprites[j].setColor(sf::Color::White);
 	if (_reverse) {

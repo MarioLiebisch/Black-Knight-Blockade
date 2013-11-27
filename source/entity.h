@@ -1,7 +1,7 @@
 /**
  * Black Knight Blockade, a simple game entry for Ludum Dare 25: You are the Villain
  * 
- * Copyright (C) 2012 Mario Liebisch <mario.liebisch@gmail.com>
+ * Copyright (c) 2013 Mario Liebisch <mario.liebisch@gmail.com>
  * 
  * This file is part of Black Knight Blockade.
  * 

@@ -1,7 +1,7 @@
 /**
  * Black Knight Blockade, a simple game entry for Ludum Dare 25: You are the Villain
  * 
- * Copyright (C) 2012 Mario Liebisch <mario.liebisch@gmail.com>
+ * Copyright (c) 2013 Mario Liebisch <mario.liebisch@gmail.com>
  * 
  * This file is part of Black Knight Blockade.
  * 
@@ -23,11 +23,11 @@
 Poof::Poof(Game *parent, int x, int y) : Entity(parent), _step(0), _astep(0) {
 	_x = x;
 	_y = y;
-	_sprite.setTexture(_parent->gettexture("data/poof.png"));
+	_sprite.setTexture(_parent->gettexture("poof.png"));
 	_sprite.setOrigin(8, 12);
 	_sprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
 	_sprite.setPosition(_x, _y);
-	_parent->getsound("data/poof.wav").play();
+	_parent->getsound("poof.wav").play();
 }
 
 Poof::~Poof(void) {

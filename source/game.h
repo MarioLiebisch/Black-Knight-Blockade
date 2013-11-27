@@ -1,7 +1,7 @@
 /**
  * Black Knight Blockade, a simple game entry for Ludum Dare 25: You are the Villain
  * 
- * Copyright (C) 2012 Mario Liebisch <mario.liebisch@gmail.com>
+ * Copyright (c) 2013 Mario Liebisch <mario.liebisch@gmail.com>
  * 
  * This file is part of Black Knight Blockade.
  * 
@@ -50,17 +50,20 @@ private:
 	std::vector<Entity*> _entities;
 	sf::Sprite _mapsprites[16];
 	sf::Sprite _fontsprite;
+	sf::Sprite _title;
 	std::map<const std::string, sf::Texture*> _textures;
 	std::map<const std::string, sf::SoundBuffer*> _buffers;
 	std::map<const std::string, sf::Sound*> _sounds;
 	Entity *_player;
 	unsigned int _tick;
 	char _rageticks;
+	char _scoreticks;
 	int _killcount;
 	int _passcount;
 	int _rage;
 	char _scoretext[32];
 	bool _doreset;
+	bool _titlewait;
 public:
 	Game(void);
 	~Game(void);
@@ -76,6 +79,7 @@ public:
 	Entity *getplayer(void) { return _player; }
 	void addpeasant(void);
 	void addpoof(int x, int y);
+	void adddust(int x, int y);
 	void drawtext(const char *text, int x, int y, const sf::Color &c = sf::Color::White);
 	void addkill(void);
 	void addpass(void);
@@ -84,7 +88,6 @@ private:
 	void _draw(void);
 	void _update(void);
 	void _keyevent(const GAME_KEY gkey, const bool pressed);
-	void _keysreset(void);
 	void _updatescore(void);
 	void _reset(void);
 };

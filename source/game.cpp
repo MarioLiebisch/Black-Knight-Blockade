@@ -1,7 +1,7 @@
 /**
  * Black Knight Blockade, a simple game entry for Ludum Dare 25: You are the Villain
  * 
- * Copyright (C) 2012 Mario Liebisch <mario.liebisch@gmail.com>
+ * Copyright (c) 2013 Mario Liebisch <mario.liebisch@gmail.com>
  * 
  * This file is part of Black Knight Blockade.
  * 
@@ -23,6 +23,7 @@
 #include "player.h"
 #include "peasant.h"
 #include "poof.h"
+#include "dust.h"
 #include <algorithm>
 #include <cstdio>
 
@@ -33,7 +34,7 @@
 namespace {
 	const char map[20][10] = {
 		{6, 7, 6, 7, 1, 3, 6, 7, 6, 7},
-		{7, 6, 7, 0, 1, 3, 0, 6, 7, 6},
+		{7, 6, 7, 6, 9,10, 7, 6, 7, 6},
 		{6, 7, 0, 0, 1, 3, 0, 0, 6, 7},
 		{7, 0, 0, 0, 1, 3, 0, 0, 0, 6},
 		{0, 0, 0, 0, 1, 3, 0, 0, 0, 0},
@@ -43,7 +44,7 @@ namespace {
 		{7, 0, 0, 0, 1, 3, 0, 0, 0, 6},
 		{6, 7, 0, 0, 1, 3, 0, 0, 6, 7},
 		/*---------------------------*/
-		{5, 4, 5, 0, 0, 0, 0, 4, 5, 4},
+		{5, 4, 5, 4, 5, 4, 5, 4, 5, 4},
 		{4, 5, 0, 0, 0, 0, 0, 0, 4, 5},
 		{5, 0, 0, 0, 0, 0, 0, 0, 0, 4},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -57,7 +58,7 @@ namespace {
 
 	const bool smap[10][10] = {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 1, 1, 0, 0, 0, 0, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 1, 0, 0, 0, 0, 0, 0, 1, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -97,8 +98,60 @@ namespace {
 	}
 }
 
-Game::Game(void) : _window(), _running(true), _fps(0), _ups(0), _caption("LD25: Black Knight Blockade"), _tick(0), _rageticks(0), _killcount(0), _passcount(0), _rage(0), _doreset(false) {
+Game::Game(void) : _window(), _running(true), _fps(0), _ups(0), _caption("Black Knight Blockade"), _tick(0), _rageticks(0), _scoreticks(0), _killcount(0), _passcount(0), _rage(0), _doreset(false), _titlewait(true) {
 	
+	_window.create(sf::VideoMode(640, 640), _caption, sf::Style::Titlebar | sf::Style::Close);
+	_window.setVerticalSyncEnabled(true);
+	_window.setView(sf::View(sf::FloatRect(0, 0, 160, 160)));
+	_window.setIcon(16, 16, (sf::Uint8*)
+		"\0\0\0\0\0\0\0\0\272\0\0\377\315\0\0\377\0\0\0\377\272\0\0\377\315\0\0\377"
+		"\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\0\0\0\0\0\0\0\0"
+		"\0\0\0\0\0\0\0\0\0\0\0\0\0\214\0\0\377\315\0\0\377&&&\377\214\0\0\377\315"
+		"\0\0\377III\377III\377III\377rrr\377\0\0\0\377\0\0\0\377\0\0\0\0\0\0\0\0"
+		"\0\0\0\0\315\0\0\377\315\0\0\377\272\0\0\377\315\0\0\377III\377\214\0\0\377"
+		"\272\0\0\377\315\0\0\377\315\0\0\377III\377III\377rrr\377\0\0\0\377\0\0\0"
+		"\377\0\0\0\0\0\0\0\0\214\0\0\377\214\0\0\377\214\0\0\377III\377rrr\377rr"
+		"r\377\214\0\0\377\214\0\0\377\214\0\0\377rrr\377rrr\377III\377rrr\377\0\0"
+		"\0\377\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\377&&&\377III\377III\377III"
+		"\377III\377&&&\377&&&\377III\377&&&\377III\377\0\0\0\377\0\0\0\0\0\0\0\0"
+		"\315\0\0\377\315\0\0\377\315\0\0\377&&&\377III\377III\377\315\0\0\377\315"
+		"\0\0\377\315\0\0\377\0\0\0\377III\377\0\0\0\377rrr\377\0\0\0\377\0\0\0\0"
+		"\0\0\0\0\214\0\0\377\214\0\0\377\272\0\0\377\315\0\0\377III\377\214\0\0\377"
+		"\272\0\0\377\214\0\0\377\315\0\0\377III\377III\377III\377rrr\377\0\0\0\377"
+		"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\214\0\0\377\315\0\0\377&&&\377\214\0\0\377"
+		"\315\0\0\377III\377III\377III\377III\377rrr\377\0\0\0\377\0\0\0\0\0\0\0\0"
+		"\0\0\0\0\0\0\0\0\0\0\0\0\214\0\0\377\315\0\0\377\0\0\0\377\214\0\0\377\315"
+		"\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\0\0\0\0"
+		"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\377&&&\377&&&\377III\377"
+		"\0\0\0\377\0\0\0\377III\377rrr\377rrr\377\0\0\0\377\0\0\0\0\0\0\0\0\0\0\0"
+		"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\377&&&\377III\377\0\0\0\377bL\14\377mR\1"
+		"\377\0\0\0\377III\377rrr\377\0\0\0\377\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+		"\0\0\0\0\0\0\377&&&\377III\377III\377\0\0\0\377MB!\377bL\14\377\0\0\0\377"
+		"III\377III\377rrr\377\0\0\0\377\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\377"
+		"&&&\377III\377III\377III\377\0\0\0\377\0\0\0\377III\377III\377III\377rrr"
+		"\377\0\0\0\377\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\377\0\0\0\377"
+		"\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0"
+		"\0\0\377\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\377MB!\377"
+		"MB!\377WG\27\377\0\0\0\377MB!\377WG\27\377bL\14\377mR\1\377\0\0\0\377\0\0"
+		"\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\377\0\0\0\377"
+		"\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\377\0\0\0\0\0\0"
+		"\0\0\0\0\0\0\0\0\0\0");
+
+	// preload textures and sounds
+	_window.clear();
+	_window.display();
+
+	gettexture("font.png");
+	gettexture("title.png");
+	gettexture("map.png");
+	gettexture("peasant.png");
+	gettexture("player.png");
+	gettexture("poof.png");
+	getsound("gameover.wav");
+	getsound("getaway.wav");
+	getsound("hurt.wav");
+	getsound("poof.wav");
+	getsound("stroke.wav");
 }
 
 Game::~Game(void) {
@@ -108,9 +161,6 @@ Game::~Game(void) {
 int Game::run(void) {
 	const int logicSteps = 100;
 	const sf::Time logicStep = sf::seconds(1) / (float)logicSteps;
-	_window.create(sf::VideoMode(320, 320), _caption, sf::Style::Titlebar | sf::Style::Close);
-	_window.setVerticalSyncEnabled(true);
-	_window.setView(sf::View(sf::FloatRect(0, 0, 160, 160)));
 	
 	sf::Event e;
 	sf::Clock updateClock;
@@ -124,7 +174,7 @@ int Game::run(void) {
 #endif
 	bool keydown = false;
 
-	sf::Texture &maptex = gettexture("data/map.png");
+	sf::Texture &maptex = gettexture("map.png");
 
 	for (int i = 0; i < KEY_COUNT; _keytapped[i] = _keydown[i] = false, i++);
 	for (int i = 0; i < 16; i++) {
@@ -132,9 +182,11 @@ int Game::run(void) {
 		_mapsprites[i].setTextureRect(sf::IntRect((i % 4) * 16, (i / 4) * 16, 16, 16));
 	}
 	
-	_fontsprite.setTexture(gettexture("data/font.png"));
+	_fontsprite.setTexture(gettexture("font.png"));
 	_fontsprite.setTextureRect(sf::IntRect(0, 0, 10, 10));
 	_fontsprite.setOrigin(0, 0);
+
+	_title.setTexture(gettexture("title.png"));
 
 	_reset();
 
@@ -183,12 +235,13 @@ int Game::run(void) {
 			_reset();
 
 		passedUpdateTime += updateClock.restart();
-		for (; _running && passedUpdateTime > logicStep; passedUpdateTime -= logicStep) {
+		for (; _running && passedUpdateTime > logicStep; passedUpdateTime += updateClock.restart() - logicStep) {
 			if (numUpdates < logicSteps) {
 				_update();
 				_entities.erase(std::remove_if(_entities.begin(), _entities.end(), &::delcheck), _entities.end());
 				for (int i = 0; i < KEY_COUNT; _keytapped[i] = false, i++);
 				++numUpdates;
+				sf::sleep(sf::microseconds(1));
 			}
 			else {
 				passedUpdateTime = sf::Time::Zero;
@@ -213,11 +266,11 @@ int Game::run(void) {
 			numFrames = 0;
 			numUpdates = 0;
 #ifndef NDEBUG
-			snprintf(caption, 255, "%s [fps: %d, ups: %d]", _caption, _fps, _ups);
+			//snprintf(caption, 255, "%s [fps: %d, ups: %d]", _caption, _fps, _ups);
+			snprintf(caption, 255, "BKB [fps: %d, ups: %d]", _fps, _ups);
 			_window.setTitle(caption);
 #endif
 		}
-		sf::sleep(sf::microseconds(1));
 	}
 
 	std::for_each(_entities.begin(), _entities.end(), ::delentity);
@@ -229,10 +282,21 @@ int Game::run(void) {
 }
 
 void Game::_update(void) {
+	if (_titlewait) {
+		if (keydown(KEY_ATTACK)) {
+			_titlewait = false;
+			_killcount = 0;
+			for (int i = 0; i < KEY_COUNT; _keytapped[i] = _keydown[i] = false, i++);
+		}
+		return;
+	}
+
 	if (_tick++ % 1500 == 0)
 		addpeasant();
 	if (_rageticks)
 		_rageticks--;
+	if (_scoreticks)
+		_scoreticks--;
 	for (int i = 0, j = _entities.size(); i < j; _entities[i]->update(), i++);
 }
 
@@ -252,30 +316,36 @@ void Game::_draw(void) {
 	for (int i = 0, j = _entities.size(); i < j; _entities[i]->draw(), i++);
 
 	for (int y = 0; y < 10; y++)
-		for (int x = 0, i = 0; x < 10; x++, i++) {
-			if (!::map[y + 10][x])
-				continue;
-			sf::Sprite s = _mapsprites[::map[y + 10][x]];
-			s.setPosition(x * 16.f, y * 16.f);
-			_window.draw(s);
-		}
-	
+	for (int x = 0, i = 0; x < 10; x++, i++) {
+		if (!::map[y + 10][x])
+			continue;
+		sf::Sprite s = _mapsprites[::map[y + 10][x]];
+		s.setPosition(x * 16.f, y * 16.f);
+		_window.draw(s);
+	}
+
 	const sf::Color &c = (_rageticks && (_rageticks / 4) % 2) ? sf::Color::Red : sf::Color::White;
-	
-	drawtext(_scoretext, 25, 5);
-	drawtext("R", 5, 5);
-	drawtext("(", 5, 10, c);
-	drawtext(_rage > 9 ? "X" : "_", 5, 20, c);
-	drawtext(_rage > 8 ? "X" : "_", 5, 30, c);
-	drawtext(_rage > 7 ? "X" : "_", 5, 40, c);
-	drawtext(_rage > 6 ? "X" : "_", 5, 50, c);
-	drawtext(_rage > 5 ? "X" : "_", 5, 60, c);
-	drawtext(_rage > 4 ? "X" : "_", 5, 70, c);
-	drawtext(_rage > 3 ? "X" : "_", 5, 80, c);
-	drawtext(_rage > 2 ? "X" : "_", 5, 90, c);
-	drawtext(_rage > 1 ? "X" : "_", 5, 100, c);
-	drawtext(_rage > 0 ? "X" : "_", 5, 110, c);
-	drawtext(")", 5, 120, c);
+	const sf::Color &c1 = (_scoreticks && (_scoreticks / 4) % 2) ? sf::Color::Green : sf::Color::White;
+
+	drawtext(_scoretext, 25, 5, c1);
+	if (_titlewait) {
+		_window.draw(_title);
+	}
+	else {
+		drawtext("R", 5, 5);
+		drawtext("(", 5, 10, c);
+		drawtext(_rage > 9 ? "X" : "_", 5, 20, c);
+		drawtext(_rage > 8 ? "X" : "_", 5, 30, c);
+		drawtext(_rage > 7 ? "X" : "_", 5, 40, c);
+		drawtext(_rage > 6 ? "X" : "_", 5, 50, c);
+		drawtext(_rage > 5 ? "X" : "_", 5, 60, c);
+		drawtext(_rage > 4 ? "X" : "_", 5, 70, c);
+		drawtext(_rage > 3 ? "X" : "_", 5, 80, c);
+		drawtext(_rage > 2 ? "X" : "_", 5, 90, c);
+		drawtext(_rage > 1 ? "X" : "_", 5, 100, c);
+		drawtext(_rage > 0 ? "X" : "_", 5, 110, c);
+		drawtext(")", 5, 120, c);
+	}
 	
 	_window.display();
 }
@@ -331,6 +401,7 @@ sf::Sound &Game::getsound(const char *file) {
 void Game::addkill(void) {
 	_killcount++;
 	_rage = std::max(_rage - 1, 0);
+	_scoreticks = 40;
 	_updatescore();
 }
 
@@ -339,12 +410,13 @@ void Game::addpass(void) {
 	if (_rage < 10) { // collect up to 10 rage
 		_rage++;
 		((Player*)_player)->setangry();
-		getsound("data/getaway.wav").play();
+		getsound("getaway.wav").play();
 		_rageticks = 40;
 	}
 	else if (_rage == 10) { // 11 rage -> game over
 		_player->querydeletion(); // i.e. kill the player
-		getsound("data/gameover.wav").play();
+		getsound("gameover.wav").play();
+		for (int i = 0; i < KEY_COUNT; _keytapped[i] = _keydown[i] = false, i++);
 	}
 	_updatescore();
 }
@@ -389,7 +461,7 @@ void Game::drawtext(const char *text, int x, int y, const sf::Color &c) {
 		default:
 			return;
 		}
-		_fontsprite.setPosition(x, y);
+		_fontsprite.setPosition((float)x, (float)y);
 		_window.draw(_fontsprite);
 		x += 9;
 		text++;
@@ -422,6 +494,11 @@ void Game::addpoof(int x, int y) {
 	_entities.push_back(p);
 }
 
+void Game::adddust(int x, int y) {
+	Dust *p = new Dust(this, x, y);
+	_entities.push_back(p);
+}
+
 void Game::_updatescore(void) {
 	snprintf(_scoretext, 32, "Sx%d", _killcount);
 }
@@ -430,9 +507,10 @@ void Game::_reset(void) {
 	_doreset = false;
 	std::for_each(_entities.begin(), _entities.end(), ::delentity);
 	_entities.clear();
-	_tick = _killcount = _passcount = _rage = 0;
+	_tick = _passcount = _rage = 0;
 	_updatescore();
 	_entities.push_back(_player = new Player(this, 80, 88));
+	_titlewait = true;
 }
 
 void Game::reset(void) {

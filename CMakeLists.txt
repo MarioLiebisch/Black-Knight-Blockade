@@ -1,7 +1,7 @@
 #
 # Black Knight Blockade, a simple game entry for Ludum Dare 25: You are the Villain
 # 
-# Copyright (C) 2012 Mario Liebisch <mario.liebisch@gmail.com>
+# Copyright (c) 2013 Mario Liebisch <mario.liebisch@gmail.com>
 # 
 # This file is part of Black Knight Blockade.
 # 
@@ -19,11 +19,11 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-project(ld25bkb)
+project(bkb)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-find_package(SFML COMPONENTS system audio graphics window REQUIRED)
+find_package(SFML COMPONENTS main system audio graphics window REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${SFML_INCLUDE_DIR})
 
@@ -38,15 +38,15 @@ if(WIN32)
 endif()
 
 if(WIN32 AND NOT MSVC AND (${CMAKE_BUILD_TYPE} MATCHES "Release"))
-  add_executable(ld25bkb WIN32 ${SOURCES})
+  add_executable(bkb WIN32 ${SOURCES})
 else()
-  add_executable(ld25bkb ${SOURCES})
+  add_executable(bkb ${SOURCES})
 endif()
 
-target_link_libraries(ld25bkb ${SFML_AUDIO_LIBRARY} ${SFML_GRAPHICS_LIBRARY} ${SFML_WINDOW_LIBRARY} ${SFML_SYSTEM_LIBRARY})
+target_link_libraries(bkb ${SFML_AUDIO_LIBRARY} ${SFML_GRAPHICS_LIBRARY} ${SFML_WINDOW_LIBRARY} ${SFML_SYSTEM_LIBRARY} ${SFML_MAIN_LIBRARY} ${SFML_DEPENDENCIES})
 
 install(FILES readme.txt license.txt DESTINATION .)
 
 file(GLOB DATA "data/*")
 install(FILES ${DATA} DESTINATION data)
-install(TARGETS ld25bkb DESTINATION .)
+install(TARGETS bkb DESTINATION .)

@@ -1,7 +1,7 @@
 /**
  * Black Knight Blockade, a simple game entry for Ludum Dare 25: You are the Villain
  * 
- * Copyright (C) 2012 Mario Liebisch <mario.liebisch@gmail.com>
+ * Copyright (c) 2013 Mario Liebisch <mario.liebisch@gmail.com>
  * 
  * This file is part of Black Knight Blockade.
  * 
@@ -19,11 +19,26 @@
  */
 
 #include <cstdio>
+#ifdef _MSC_VER
+#include <direct.h>
+#define chdir(a) _chdir(a)
+#ifdef NDEBUG
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS")
+#endif
+#elif ANDROID
+#else
+#include <dir.h>
+#endif
 #include "game.h"
 
 int main(int argc, const char *argv[])
 {
-	srand(time(0));
+	srand((unsigned int)time(0));
+#ifdef ANDROID
+#else
+	chdir("data");
+#endif
+
 	try {
 		Game game;
 		return game.run();

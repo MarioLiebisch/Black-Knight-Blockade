@@ -1,7 +1,7 @@
 /**
  * Black Knight Blockade, a simple game entry for Ludum Dare 25: You are the Villain
  * 
- * Copyright (C) 2012 Mario Liebisch <mario.liebisch@gmail.com>
+ * Copyright (c) 2013 Mario Liebisch <mario.liebisch@gmail.com>
  * 
  * This file is part of Black Knight Blockade.
  * 
@@ -23,7 +23,7 @@
 Player::Player(Game *parent, int x, int y) : Entity(parent), _dx(0), _dy(0), _moving(false), _reverse(false), _step(0), _astep(-1), _alive(true), _exstep(0) {
 	_x = x;
 	_y = y;
-	sf::Texture &tex = _parent->gettexture("data/player.png");
+	sf::Texture &tex = _parent->gettexture("player.png");
 	for (int i = 0; i < 4; i++) {
 		_sprites[i].setTexture(tex);
 		_sprites[i].setTextureRect(sf::IntRect(i * 16, 0, 16, 16));
@@ -63,8 +63,7 @@ void Player::update() {
 			}
 		}
 		else {
-			if (_parent->keytapped(KEY_ATTACK))
-				_parent->reset();
+			_parent->reset();
 		}
 		return;
 	}
@@ -105,7 +104,7 @@ void Player::update() {
 		_astep = -1;
 	if (_astep == - 1 && _parent->keydown(KEY_ATTACK)) {
 		_astep = 0;
-		_parent->getsound("data/stroke.wav").play();
+		_parent->getsound("stroke.wav").play();
 	}
 }
 
