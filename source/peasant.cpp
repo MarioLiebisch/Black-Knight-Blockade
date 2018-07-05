@@ -94,7 +94,7 @@ void Peasant::update() {
 			_x -= 8;
 		else
 			_x += 8;
-		_y -= (py - _y) / 2.f;
+		_y -= static_cast<int>((py - _y) / 2.f);
 
 		_parent->getsound("hurt.wav").play();
 
@@ -146,8 +146,8 @@ void Peasant::draw() {
 		_sprites[i].setScale(1, 1);
 		_sprites[j].setScale(1, 1);
 	}
-	_sprites[i].setPosition(_x, _y);
-	_sprites[j].setPosition(_x, _y);
+	_sprites[i].setPosition(static_cast<float>(_x), static_cast<float>(_y));
+	_sprites[j].setPosition(static_cast<float>(_x), static_cast<float>(_y));
 	_parent->gettarget().draw(_sprites[i]);
 	_parent->gettarget().draw(_sprites[j]);
 }

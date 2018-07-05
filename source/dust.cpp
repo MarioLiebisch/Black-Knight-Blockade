@@ -26,7 +26,7 @@ Dust::Dust(Game *parent, int x, int y) : Entity(parent), _step(0), _astep(0) {
 	_sprite.setTexture(_parent->gettexture("dust.png"));
 	_sprite.setOrigin(4, 5);
 	_sprite.setTextureRect(sf::IntRect(0, 0, 8, 8));
-	_sprite.setPosition(_x, _y);
+	_sprite.setPosition(static_cast<float>(_x), static_cast<float>(_y));
 	//_parent->getsound("poof.wav").play();
 }
 
@@ -43,6 +43,6 @@ void Dust::update() {
 }
 
 void Dust::draw() {
-	_sprite.setOrigin(4, 5 + _step / 10);
+	_sprite.setOrigin(4.f, 5.f + _step / 10);
 	_parent->gettarget().draw(_sprite);
 }

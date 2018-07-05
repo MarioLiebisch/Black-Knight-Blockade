@@ -160,7 +160,7 @@ Game::~Game(void) {
 
 int Game::run(void) {
 	const int logicSteps = 100;
-	const sf::Time logicStep = sf::seconds(1) / (float)logicSteps;
+	const sf::Time logicStep = sf::seconds(1) / static_cast<float>(logicSteps);
 	
 	sf::Event e;
 	sf::Clock updateClock;
@@ -259,7 +259,7 @@ int Game::run(void) {
 		_draw();
 
 		passedStatTime += statClock.restart();
-		if ((int)passedStatTime.asSeconds() > 0) {
+		if (static_cast<int>(passedStatTime.asSeconds()) > 0) {
 			passedStatTime = sf::Time::Zero;
 			_fps = numFrames;
 			_ups = numUpdates;
@@ -461,7 +461,7 @@ void Game::drawtext(const char *text, int x, int y, const sf::Color &c) {
 		default:
 			return;
 		}
-		_fontsprite.setPosition((float)x, (float)y);
+		_fontsprite.setPosition(static_cast<float>(x), static_cast<float>(y));
 		_window.draw(_fontsprite);
 		x += 9;
 		text++;

@@ -26,7 +26,7 @@ Poof::Poof(Game *parent, int x, int y) : Entity(parent), _step(0), _astep(0) {
 	_sprite.setTexture(_parent->gettexture("poof.png"));
 	_sprite.setOrigin(8, 12);
 	_sprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
-	_sprite.setPosition(_x, _y);
+	_sprite.setPosition(static_cast<float>(_x), static_cast<float>(_y));
 	_parent->getsound("poof.wav").play();
 }
 

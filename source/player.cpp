@@ -113,8 +113,8 @@ void Player::draw() {
 	if (!_alive) {
 		if (_step < 120) {
 			_sprites[0].setColor(_step % 4 ? sf::Color::White : sf::Color::Red);
-			_sprites[0].setScale(_reverse ? -1 : 1, 1);
-			_sprites[0].setPosition(_x, _y);
+			_sprites[0].setScale(_reverse ? -1 : 1.f, 1.f);
+			_sprites[0].setPosition(static_cast<float>(_x), static_cast<float>(_y));
 			rt.draw(_sprites[0]);
 		}
 		return;
@@ -132,15 +132,15 @@ void Player::draw() {
 		_sword.setScale(1, 1);
 		_exmark.setScale(1, 1);
 	}
-	_sprites[i].setPosition(_x, _y);
+	_sprites[i].setPosition(static_cast<float>(_x), static_cast<float>(_y));
 	if (_astep > -1 && _astep < 18) {
-		_sword.setPosition(_reverse ? _x - _astep / 2: _x + _astep / 2, _y);
+		_sword.setPosition(static_cast<float>(_reverse ? _x - _astep / 2: _x + _astep / 2), static_cast<float>(_y));
 		rt.draw(_sword);
 	}
 	rt.draw(_sprites[i]);
 	if (_exstep) {
 		if ((_exstep / 2) % 2) {
-			_exmark.setPosition(_x, _y);
+			_exmark.setPosition(static_cast<float>(_x), static_cast<float>(_y));
 			rt.draw(_exmark);
 		}
 		_exstep--;
